@@ -1,0 +1,141 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Account {
+public:
+    string name;
+    int pin;
+    double balance;
+    int attempts;
+
+    Account(string n, int p, double b) {
+        name = n;
+        pin = p;
+        balance = b;
+        attempts = 0;
+    }
+
+    bool checkPin(int enteredPin) {
+        if (enteredPin == pin) {
+            attempts = 0;
+            return true;
+        } else {
+            attempts++;
+            return false;
+        }
+    }
+
+    bool isLocked() {
+        return attempts >= 3;
+    }
+
+    void showBalance() {
+        cout << "\nAccount Holder : " << name << endl;
+        cout << "Current Balance: Rs. " << balance << endl;
+    }
+
+    void deposit(double amount) {
+        if (amount <= 0) {
+            cout << "\nInvalid amount!" << endl;
+        } else {
+            balance += amount;
+            cout << "\nRs. " << amount << " deposited successfully!" << endl;
+            cout << "New Balance: Rs. " << balance << endl;
+        }
+    }
+
+    void withdraw(double amount) {
+        if (amount <= 0) {
+            cout << "\nInvalid amount!" << endl;
+        } else if (amount > balance) {
+            cout << "\nInsufficient balance!" << endl;
+        } else {
+            balance -= amount;
+            cout << "\nRs. " << amount << " withdrawn successfully!" << endl;
+            cout << "Remaining Balance: Rs. " << balance << endl;
+        }
+    }
+};
+
+class ATM {
+public:
+    Account account;
+
+    ATM() : account("Ali Hassan", 1234, 50000) {}
+
+    void login() {
+        int enteredPin;
+
+        cout << "================================" << endl;
+        cout << "       WELCOME TO THE ATM       " << endl;
+        cout << "================================" << endl;
+        cout << "Account Holder: " << account.name << endl;
+
+        while (true) {
+            if (account.isLocked()) {
+                cout << "\nAccount is LOCKED after 3 wrong attempts!" << endl;
+                cout << "Please contact your bank." << endl;
+                return;
+            }
+
+            cout << "\nEnter PIN: ";
+            cin >> enteredPin;
+
+            if (account.checkPin(enteredPin)) {
+                cout << "\nLogin Successful! Welcome, " << account.name << endl;
+                showMenu();
+                return;
+            } else {
+                cout << "Wrong PIN! Attempts left: " << (3 - account.attempts) << endl;
+            }
+        }
+    }
+
+    void showMenu() {
+        int choice;
+
+        do {
+            cout << "\n================================" << endl;
+            cout << "           ATM MENU             " << endl;
+            cout << "================================" << endl;
+            cout << "1. Check Balance" << endl;
+            cout << "2. Deposit Money" << endl;
+            cout << "3. Withdraw Money" << endl;
+            cout << "4. Exit" << endl;
+            cout << "================================" << endl;
+            cout << "Enter Choice: ";
+            cin >> choice;
+
+            if (choice == 1) {
+                account.showBalance();
+            }
+            else if (choice == 2) {
+                double amount;
+                cout << "\nEnter amount to deposit: Rs. ";
+                cin >> amount;
+                account.deposit(amount);
+            }
+            else if (choice == 3) {
+                double amount;
+                cout << "\nEnter amount to withdraw: Rs. ";
+                cin >> amount;
+                account.withdraw(amount);
+            }
+            else if (choice == 4) {
+                cout << "\nThank you for using the ATM!" << endl;
+                cout << "Goodbye, " << account.name << "!" << endl;
+            }
+            else {
+                cout << "\nInvalid choice! Please enter 1 to 4." << endl;
+            }
+
+        } while (choice != 4);
+    }
+};
+
+int main() {
+    ATM atm;
+    atm.login();
+    return 0;
+}
